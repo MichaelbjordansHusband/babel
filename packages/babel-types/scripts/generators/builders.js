@@ -100,11 +100,24 @@ function generateLowercaseBuilders() {
  * This file is auto-generated! Do not modify it directly.
  * To re-generate run 'make build'
  */
-import validateNode from "../validateNode";
+import { validateNodeInternal as validate } from "../validateNode";;
 import type * as t from "../..";
 import deprecationWarning from "../../utils/deprecationWarning";
+import {
+  BUILDER_KEYS,
+  NODE_FIELDS,
+  type FieldDefinitions,
+} from "../../definitions/utils";
+
+const _data: Array<[FieldDefinitions, string[]]> = [];
+Object.keys(BUILDER_KEYS).forEach(type => {
+  const fields = NODE_FIELDS[type];
+  _data.push([fields, BUILDER_KEYS[type]]);
+});
+
 `;
 
+  let i = 0;
   const reservedNames = new Set(["super", "import"]);
   Object.keys(BUILDER_KEYS).forEach(type => {
     const defArgs = generateBuilderArgs(type);
@@ -136,11 +149,12 @@ import deprecationWarning from "../../utils/deprecationWarning";
       .join("\n")}\n  }`;
 
     if (builderNames.length > 0) {
-      output += `\n  return validateNode<t.${type}>(${nodeObjectExpression});`;
+      output += `\n  return validate<t.${type}>(${nodeObjectExpression},_data[${i}]);`;
     } else {
       output += `\n  return ${nodeObjectExpression};`;
     }
     output += `\n}\n`;
+    i++;
 
     if (formattedBuilderNameLocal !== formattedBuilderName) {
       output += `export { ${formattedBuilderNameLocal} as ${formattedBuilderName} };\n`;
