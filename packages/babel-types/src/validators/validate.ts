@@ -25,9 +25,18 @@ export function validateInternal(
   node: t.Node | undefined | null,
   key: string,
   val: unknown,
+  maybeNode?: boolean,
 ): void {
-  validateField(node, key, val, field);
-  validateChild(node, key, val);
+  if (!field?.validate) return;
+  if (field.optional && val == null) return;
+
+  field.validate(node, key, val);
+
+  if (maybeNode) {
+    const type = node?.type;
+    if (type == null) return;
+    NODE_PARENT_VALIDATIONS[type]?.(node, key, val);
+  }
 }
 
 export function validateField(

@@ -100,20 +100,36 @@ function generateLowercaseBuilders() {
  * This file is auto-generated! Do not modify it directly.
  * To re-generate run 'make build'
  */
-import { validateNodeInternal as validate } from "../validateNode";;
+import * as _validate from "../../validators/validate";
 import type * as t from "../..";
 import deprecationWarning from "../../utils/deprecationWarning";
 import {
   BUILDER_KEYS,
   NODE_FIELDS,
-  type FieldDefinitions,
+  type FieldOptions,
 } from "../../definitions/utils";
 
-const _data: Array<[FieldDefinitions, string[]]> = [];
+const { validateInternal: validate } = _validate;
+
+const _data: FieldOptions[][] = [];
 Object.keys(BUILDER_KEYS).forEach(type => {
   const fields = NODE_FIELDS[type];
-  _data.push([fields, BUILDER_KEYS[type]]);
+
+  _data.push(
+    sortFieldNames(Object.keys(fields), type).map(field => fields[field]),
+  );
 });
+
+function sortFieldNames(fields: string[], type: string) {
+  return fields.sort((fieldA, fieldB) => {
+    const indexA = BUILDER_KEYS[type].indexOf(fieldA);
+    const indexB = BUILDER_KEYS[type].indexOf(fieldB);
+    if (indexA === indexB) return fieldA < fieldB ? -1 : 1;
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+}
 
 `;
 
@@ -149,7 +165,24 @@ Object.keys(BUILDER_KEYS).forEach(type => {
       .join("\n")}\n  }`;
 
     if (builderNames.length > 0) {
-      output += `\n  return validate<t.${type}>(${nodeObjectExpression},_data[${i}]);`;
+      output += `\n  const node:t.${type} = ${nodeObjectExpression};`;
+
+      fieldNames.forEach(fieldName => {
+        const field = NODE_FIELDS[type][fieldName];
+        if (field && builderNames.includes(fieldName)) {
+          const argName = toBindingIdentifierName(fieldName);
+          output += `\n  validate(_data[${i}][${fieldNames.indexOf(
+            fieldName
+          )}], node, "${fieldName}", ${argName}${
+            JSON.stringify(
+              stringifyValidator(field.validate, "#node#")
+            ).includes("#node#")
+              ? ", true"
+              : ""
+          });`;
+        }
+      });
+      output += `\n  return node;`;
     } else {
       output += `\n  return ${nodeObjectExpression};`;
     }
