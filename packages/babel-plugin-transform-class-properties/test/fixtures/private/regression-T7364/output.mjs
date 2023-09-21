@@ -4,14 +4,11 @@ class MyClass {
     var _this = this;
     babelHelpers.classPrivateFieldInitSpec(this, _myAsyncMethod, {
       writable: true,
-      value: function () {
-        var _ref = babelHelpers.asyncToGenerator(function* () {
+      value: function value() {
+        return babelHelpers.callAsync(function* () {
           console.log(_this);
-        });
-        return function value() {
-          return _ref.apply(this, arguments);
-        };
-      }()
+        }, this, arguments);
+      }
     });
   }
 }
@@ -21,14 +18,11 @@ var _myAsyncMethod2 = /*#__PURE__*/new WeakMap();
     var _this2 = this;
     babelHelpers.classPrivateFieldInitSpec(this, _myAsyncMethod2, {
       writable: true,
-      value: function () {
-        var _ref2 = babelHelpers.asyncToGenerator(function* () {
+      value: function value() {
+        return babelHelpers.callAsync(function* () {
           console.log(_this2);
-        });
-        return function value() {
-          return _ref2.apply(this, arguments);
-        };
-      }()
+        }, this, arguments);
+      }
     });
   }
 });
@@ -38,14 +32,11 @@ export default class MyClass3 {
     var _this3 = this;
     babelHelpers.classPrivateFieldInitSpec(this, _myAsyncMethod3, {
       writable: true,
-      value: function () {
-        var _ref3 = babelHelpers.asyncToGenerator(function* () {
+      value: function value() {
+        return babelHelpers.callAsync(function* () {
           console.log(_this3);
-        });
-        return function value() {
-          return _ref3.apply(this, arguments);
-        };
-      }()
+        }, this, arguments);
+      }
     });
   }
 }
