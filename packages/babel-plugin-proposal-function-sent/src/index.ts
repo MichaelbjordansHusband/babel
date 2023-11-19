@@ -47,11 +47,7 @@ export default declare(api => {
     inherits: syntaxFunctionSent,
 
     visitor: {
-      CallExpression(path, state) {
-        if (state.availableHelper("callSkipFirstGeneratorNext")) {
-          wrapFunction.onCallExpressionExit(path);
-        }
-      },
+      ...wrapFunction.buildOnCallExpression("callSkipFirstGeneratorNext"),
       MetaProperty(path, state) {
         if (!isFunctionSent(path.node)) return;
 
